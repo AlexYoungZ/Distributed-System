@@ -4,7 +4,7 @@ package main
 // start the master process, which is implemented
 // in ../mr/master.go
 //
-// go run mrmaster.go pg*.txt
+// within main dir, go run mrmaster.go pg*.txt
 //
 // Please do not change this file.
 //

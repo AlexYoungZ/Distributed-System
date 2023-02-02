@@ -14,9 +14,11 @@ import "log"
 import "io/ioutil"
 import "sort"
 
+// ByKey
 // for sorting by key.
 type ByKey []mr.KeyValue
 
+// Len
 // for sorting by key.
 func (a ByKey) Len() int           { return len(a) }
 func (a ByKey) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
