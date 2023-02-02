@@ -3,13 +3,13 @@ package mr
 import (
 	"encoding/json"
 	"fmt"
+	"hash/fnv"
 	"io/ioutil"
+	"log"
+	"net/rpc"
 	"os"
 	"strings"
 )
-import "log"
-import "net/rpc"
-import "hash/fnv"
 
 // KeyValue
 // Map functions return a slice of KeyValue.
@@ -18,7 +18,8 @@ type KeyValue struct {
 	Value string
 }
 
-// use ihash(key) % NReduce to choose the reduce task number for each KeyValue emitted by Map.
+// use ihash(key) % NReduce to choose the reduce
+// task number for each KeyValue emitted by Map.
 func ihash(key string) int {
 	h := fnv.New32a()
 	h.Write([]byte(key))
@@ -38,7 +39,6 @@ func Worker(mapf func(string, string) []KeyValue,
 	w.run()
 	// uncomment to send the Example RPC to the master.
 	// CallExample()
-
 }
 
 type worker struct {
