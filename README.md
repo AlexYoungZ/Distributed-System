@@ -1,10 +1,10 @@
-
 # 6.824: Distributed Systems
+
 * * *
 
-@ MIT 
+@ MIT
 @ Instructor: [Robert Morris](https://pdos.csail.mit.edu/~rtm/)   
-@ [Course Website](https://pdos.csail.mit.edu/6.824/schedule.html)  
+@ [Course Website](https://pdos.csail.mit.edu/6.824/schedule.html)
 
 * * *
 
@@ -28,12 +28,13 @@ Your job is to implement a distributed MapReduce, consisting of two programs, th
 * * *
 
 ### Distributed System Labs
-Lab Index | Detailed Requirements | Quick Link to My Solution
---------------- | --------------- | ---------------
-Lab 1 | [MapReduce](http://nil.csail.mit.edu/6.824/2020/labs/lab-mr.html) | [mr](https://github.com/AlexYoungZ/Distributed-System-6.824/tree/master/src/mr)
-Lab 2 | [Raft](http://nil.csail.mit.edu/6.824/2020/labs/lab-raft.html) | [raft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_2)
-Lab 3 | [Fault-tolerant Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-kvraft.html) | [kvraft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_3)
-Lab 4 | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html) | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4)
+
+| Lab Index | Detailed Requirements                                                                        | Quick Link to My Solution                                                                                                             |
+|-----------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| Lab 1     | [MapReduce](http://nil.csail.mit.edu/6.824/2020/labs/lab-mr.html)                            | [mr](https://github.com/AlexYoungZ/Distributed-System-6.824/tree/master/src/mr)                                                       |
+| Lab 2     | [Raft](http://nil.csail.mit.edu/6.824/2020/labs/lab-raft.html)                               | [raft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_2)    |
+| Lab 3     | [Fault-tolerant Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-kvraft.html) | [kvraft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_3)  |
+| Lab 4     | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html)         | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4) |
 
 * * *
 
