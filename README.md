@@ -16,7 +16,18 @@
 
 * * *
 
-## Lab 1: MapReduce
+### Distributed System Labs
+
+| Lab Index                | Detailed Requirements                                                                        | Quick Link to My Solution                                                                                                             |
+|--------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| [Lab 1](#lab1-mapreduce) | [MapReduce](http://nil.csail.mit.edu/6.824/2020/labs/lab-mr.html)                            | [mr](https://github.com/AlexYoungZ/Distributed-System-6.824/tree/master/src/mr)                                                       |
+| [Lab 2](#lab2-raft)      | [Raft](http://nil.csail.mit.edu/6.824/2020/labs/lab-raft.html)                               | [raft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_2)    |
+| Lab 3                    | [Fault-tolerant Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-kvraft.html) | [kvraft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_3)  |
+| Lab 4                    | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html)         | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4) |
+
+* * *
+
+## Lab1 MapReduce
 
 <p align="justify">
 In this lab you'll build a MapReduce system. You'll implement a worker process that calls application Map and Reduce functions and handles reading and writing files, and a master process that hands out tasks to workers and copes with failed workers. You'll be building something similar to the MapReduce paper.
@@ -27,7 +38,7 @@ Your job is to implement a distributed MapReduce, consisting of two programs, th
 
 * * *
 
-## Lab 2: Raft
+## Lab2 Raft
 
 ### Introduction
 
@@ -101,15 +112,5 @@ SaveRaftState() methods.
 
 * * *
 
-### Distributed System Labs
-
-| Lab Index | Detailed Requirements                                                                        | Quick Link to My Solution                                                                                                             |
-|-----------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| Lab 1     | [MapReduce](http://nil.csail.mit.edu/6.824/2020/labs/lab-mr.html)                            | [mr](https://github.com/AlexYoungZ/Distributed-System-6.824/tree/master/src/mr)                                                       |
-| Lab 2     | [Raft](http://nil.csail.mit.edu/6.824/2020/labs/lab-raft.html)                               | [raft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_2)    |
-| Lab 3     | [Fault-tolerant Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-kvraft.html) | [kvraft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_3)  |
-| Lab 4     | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html)         | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4) |
-
-* * *
 
 
