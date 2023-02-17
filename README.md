@@ -11,7 +11,7 @@
 ## Overview
 
 <p align="justify">
-6.824 is a core 12-unit graduate subject with lectures, readings, programming labs, an optional project, a mid-term exam, and a final exam. It will present abstractions and implementation techniques for engineering distributed systems. Major topics include fault tolerance, replication, and consistency. Much of the class consists of studying and discussing case studies of distributed systems.
+6.824 is a core 12-unit graduate subject with lectures, readings, programming labs, an optional project, a midterm exam, and a final exam. It will present abstractions and implementation techniques for engineering distributed systems. Major topics include fault tolerance, replication, and consistency. Much of the class consists of studying and discussing case studies of distributed systems.
 </p>
 
 * * *
@@ -22,8 +22,8 @@
 |--------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
 | [Lab 1](#lab1-mapreduce) | [MapReduce](http://nil.csail.mit.edu/6.824/2020/labs/lab-mr.html)                            | [mr](https://github.com/AlexYoungZ/Distributed-System-6.824/tree/master/src/mr)                                                       |
 | [Lab 2](#lab2-raft)      | [Raft](http://nil.csail.mit.edu/6.824/2020/labs/lab-raft.html)                               | [raft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_2)    |
-| Lab 3                    | [Fault-tolerant Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-kvraft.html) | [kvraft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_3)  |
-| Lab 4                    | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html)         | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4) |
+| [Lab 3]()                | [Fault-tolerant Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-kvraft.html) | [kvraft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_3)  |
+| [Lab 4]()                | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html)         | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4) |
 
 * * *
 
