@@ -2,6 +2,7 @@ package raft
 
 import "log"
 
+// Debug
 // Debugging
 const Debug = 0
 
