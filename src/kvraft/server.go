@@ -1,10 +1,10 @@
 package kvraft
 
 import (
-	"../labgob"
-	"../labrpc"
+	"6.824/src/labgob"
+	"6.824/src/labrpc"
+	"6.824/src/raft"
 	"log"
-	"../raft"
 	"sync"
 	"sync/atomic"
 )
@@ -17,7 +17,6 @@ func DPrintf(format string, a ...interface{}) (n int, err error) {
 	}
 	return
 }
-
 
 type Op struct {
 	// Your definitions here.
@@ -37,7 +36,6 @@ type KVServer struct {
 	// Your definitions here.
 }
 
-
 func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 	// Your code here.
 }
@@ -46,7 +44,7 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	// Your code here.
 }
 
-//
+// Kill
 // the tester calls Kill() when a KVServer instance won't
 // be needed again. for your convenience, we supply
 // code to set rf.dead (without needing a lock),
@@ -67,7 +65,7 @@ func (kv *KVServer) killed() bool {
 	return z == 1
 }
 
-//
+// StartKVServer
 // servers[] contains the ports of the set of
 // servers that will cooperate via Raft to
 // form the fault-tolerant key/value service.
