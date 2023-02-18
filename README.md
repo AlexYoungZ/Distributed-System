@@ -18,12 +18,12 @@
 
 ### Distributed System Labs
 
-| Lab Index                | Detailed Requirements                                                                        | Quick Link to My Solution                                                                                                             |
-|--------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| [Lab 1](#lab1-mapreduce) | [MapReduce](http://nil.csail.mit.edu/6.824/2020/labs/lab-mr.html)                            | [mr](https://github.com/AlexYoungZ/Distributed-System-6.824/tree/master/src/mr)                                                       |
-| [Lab 2](#lab2-raft)      | [Raft](http://nil.csail.mit.edu/6.824/2020/labs/lab-raft.html)                               | [raft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_2)    |
-| [Lab 3]()                | [Fault-tolerant Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-kvraft.html) | [kvraft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_3)  |
-| [Lab 4]()                | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html)         | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4) |
+| Lab Index                                      | Detailed Requirements                                                                        | Quick Link to My Solution                                                                                                             |
+|------------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| [Lab 1](#lab1-mapreduce)                       | [MapReduce](http://nil.csail.mit.edu/6.824/2020/labs/lab-mr.html)                            | [mr](https://github.com/AlexYoungZ/Distributed-System-6.824/tree/master/src/mr)                                                       |
+| [Lab 2](#lab2-raft)                            | [Raft](http://nil.csail.mit.edu/6.824/2020/labs/lab-raft.html)                               | [raft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_2)    |
+| [Lab 3](#lab3-fault-tolerant-keyvalue-service) | [Fault-tolerant Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-kvraft.html) | [kvraft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_3)  |
+| [Lab 4]()                                      | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html)         | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4) |
 
 * * *
 
@@ -112,5 +112,67 @@ SaveRaftState() methods.
 
 * * *
 
+## Lab3 Fault-tolerant Key/Value Service
+
+### Introduction
+
+<p align="justify">
+
+In this lab you will build a fault-tolerant key/value storage service using your Raft library from lab 2. Your key/value
+service will be a replicated state machine, consisting of several key/value servers that use Raft for replication. Your
+key/value service should continue to process client requests as long as a majority of the servers are alive and can
+communicate, in spite of other failures or network partitions.
+
+The service supports three operations: Put(key, value), Append(key, arg), and Get(key). It maintains a simple database
+of key/value pairs. Keys and values are strings. Put() replaces the value for a particular key in the database, Append(
+key, arg) appends arg to key's value, and Get() fetches the current value for a key. A Get for a non-existant key should
+return an empty string. An Append to a non-existant key should act like Put. Each client talks to the service through a
+Clerk with Put/Append/Get methods. A Clerk manages RPC interactions with the servers.
+
+Your service must provide strong consistency to application calls to the Clerk Get/Put/Append methods. Here's what we
+mean by strong consistency. If called one at a time, the Get/Put/Append methods should act as if the system had only one
+copy of its state, and each call should observe the modifications to the state implied by the preceding sequence of
+calls. For concurrent calls, the return values and final state must be the same as if the operations had executed one at
+a time in some order. Calls are concurrent if they overlap in time, for example if client X calls Clerk.Put(), then
+client Y calls Clerk.Append(), and then client X's call returns. Furthermore, a call must observe the effects of all
+calls that have completed before the call starts (so we are technically asking for linearizability).
+
+Strong consistency is convenient for applications because it means that, informally, all clients see the same state and
+they all see the latest state. Providing strong consistency is relatively easy for a single server. It is harder if the
+service is replicated, since all servers must choose the same execution order for concurrent requests, and must avoid
+replying to clients using state that isn't up to date.
+
+This lab has two parts. In part A, you will implement the service without worrying that the Raft log can grow without
+bound. In part B, you will implement snapshots (Section 7 in the paper), which will allow Raft to discard old log
+entries. Please submit each part by the respective deadline.
+</p>
+
+* * *
+
+### Part A: Key/value service without log compaction
+
+
+<p align="justify">
+Each of your key/value servers ("kvservers") will have an associated Raft peer. Clerks send Put(), Append(), and Get() RPCs to the kvserver whose associated Raft is the leader. The kvserver code submits the Put/Append/Get operation to Raft, so that the Raft log holds a sequence of Put/Append/Get operations. All of the kvservers execute operations from the Raft log in order, applying the operations to their key/value databases; the intent is for the servers to maintain identical replicas of the key/value database.
+
+A Clerk sometimes doesn't know which kvserver is the Raft leader. If the Clerk sends an RPC to the wrong kvserver, or if it cannot reach the kvserver, the Clerk should re-try by sending to a different kvserver. If the key/value service commits the operation to its Raft log (and hence applies the operation to the key/value state machine), the leader reports the result to the Clerk by responding to its RPC. If the operation failed to commit (for example, if the leader was replaced), the server reports an error, and the Clerk retries with a different server.
+
+Your kvservers should not directly communicate; they should only interact with each other through Raft. For all parts of Lab 3, you must make sure that your Raft implementation continues to pass all of the Lab 2 tests.</p>
+</p>
+
+* * *
+
+### Part B: Key/value service with log compaction
+
+
+<p align="justify">
+As things stand now with your code, a rebooting server replays the complete Raft log in order to restore its state. However, it's not practical for a long-running server to remember the complete Raft log forever. Instead, you'll modify Raft and kvserver to cooperate to save space: from time to time kvserver will persistently store a "snapshot" of its current state, and Raft will discard log entries that precede the snapshot. When a server restarts (or falls far behind the leader and must catch up), the server first installs a snapshot and then replays log entries from after the point at which the snapshot was created. Section 7 of the extended Raft paper outlines the scheme; you will have to design the details.
+
+You must design an interface between your Raft library and your service that allows your Raft library to discard log entries. You must revise your Raft code to operate while storing only the tail of the log. Raft should discard old log entries in a way that allows the Go garbage collector to free and re-use the memory; this requires that there be no reachable references (pointers) to the discarded log entries.
+
+The tester passes maxraftstate to your StartKVServer(). maxraftstate indicates the maximum allowed size of your persistent Raft state in bytes (including the log, but not including snapshots). You should compare maxraftstate to persister.RaftStateSize(). Whenever your key/value server detects that the Raft state size is approaching this threshold, it should save a snapshot, and tell the Raft library that it has snapshotted, so that Raft can discard old log entries. If maxraftstate is -1, you do not have to snapshot. maxraftstate applies to the GOB-encoded bytes your Raft passes to persister.SaveRaftState().
+</p>
+
+* * *
 
 
