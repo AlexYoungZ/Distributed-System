@@ -23,7 +23,7 @@
 | [Lab 1](#lab1-mapreduce)                       | [MapReduce](http://nil.csail.mit.edu/6.824/2020/labs/lab-mr.html)                            | [mr](https://github.com/AlexYoungZ/Distributed-System-6.824/tree/master/src/mr)                                                       |
 | [Lab 2](#lab2-raft)                            | [Raft](http://nil.csail.mit.edu/6.824/2020/labs/lab-raft.html)                               | [raft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_2)    |
 | [Lab 3](#lab3-fault-tolerant-keyvalue-service) | [Fault-tolerant Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-kvraft.html) | [kvraft](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_3)  |
-| [Lab 4]()                                      | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html)         | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4) |
+| [Lab 4](#lab4-sharded-keyvalue-service)        | [Sharded Key/Value Service](http://nil.csail.mit.edu/6.824/2020/labs/lab-shard.html)         | [shardkv](https://github.com/AlexYoungZ/Parallel-Concurrent-Distributed-Programming/tree/master/Parallel%20Programming/miniproject_4) |
 
 * * *
 
@@ -151,28 +151,85 @@ entries. Please submit each part by the respective deadline.
 
 ### Part A: Key/value service without log compaction
 
-
 <p align="justify">
 Each of your key/value servers ("kvservers") will have an associated Raft peer. Clerks send Put(), Append(), and Get() RPCs to the kvserver whose associated Raft is the leader. The kvserver code submits the Put/Append/Get operation to Raft, so that the Raft log holds a sequence of Put/Append/Get operations. All of the kvservers execute operations from the Raft log in order, applying the operations to their key/value databases; the intent is for the servers to maintain identical replicas of the key/value database.
 
-A Clerk sometimes doesn't know which kvserver is the Raft leader. If the Clerk sends an RPC to the wrong kvserver, or if it cannot reach the kvserver, the Clerk should re-try by sending to a different kvserver. If the key/value service commits the operation to its Raft log (and hence applies the operation to the key/value state machine), the leader reports the result to the Clerk by responding to its RPC. If the operation failed to commit (for example, if the leader was replaced), the server reports an error, and the Clerk retries with a different server.
+A Clerk sometimes doesn't know which kvserver is the Raft leader. If the Clerk sends an RPC to the wrong kvserver, or if
+it cannot reach the kvserver, the Clerk should re-try by sending to a different kvserver. If the key/value service
+commits the operation to its Raft log (and hence applies the operation to the key/value state machine), the leader
+reports the result to the Clerk by responding to its RPC. If the operation failed to commit (for example, if the leader
+was replaced), the server reports an error, and the Clerk retries with a different server.
 
-Your kvservers should not directly communicate; they should only interact with each other through Raft. For all parts of Lab 3, you must make sure that your Raft implementation continues to pass all of the Lab 2 tests.</p>
+Your kvservers should not directly communicate; they should only interact with each other through Raft. For all parts of
+Lab 3, you must make sure that your Raft implementation continues to pass all of the Lab 2 tests.</p>
 </p>
 
 * * *
 
 ### Part B: Key/value service with log compaction
 
-
 <p align="justify">
 As things stand now with your code, a rebooting server replays the complete Raft log in order to restore its state. However, it's not practical for a long-running server to remember the complete Raft log forever. Instead, you'll modify Raft and kvserver to cooperate to save space: from time to time kvserver will persistently store a "snapshot" of its current state, and Raft will discard log entries that precede the snapshot. When a server restarts (or falls far behind the leader and must catch up), the server first installs a snapshot and then replays log entries from after the point at which the snapshot was created. Section 7 of the extended Raft paper outlines the scheme; you will have to design the details.
 
-You must design an interface between your Raft library and your service that allows your Raft library to discard log entries. You must revise your Raft code to operate while storing only the tail of the log. Raft should discard old log entries in a way that allows the Go garbage collector to free and re-use the memory; this requires that there be no reachable references (pointers) to the discarded log entries.
+You must design an interface between your Raft library and your service that allows your Raft library to discard log
+entries. You must revise your Raft code to operate while storing only the tail of the log. Raft should discard old log
+entries in a way that allows the Go garbage collector to free and re-use the memory; this requires that there be no
+reachable references (pointers) to the discarded log entries.
 
-The tester passes maxraftstate to your StartKVServer(). maxraftstate indicates the maximum allowed size of your persistent Raft state in bytes (including the log, but not including snapshots). You should compare maxraftstate to persister.RaftStateSize(). Whenever your key/value server detects that the Raft state size is approaching this threshold, it should save a snapshot, and tell the Raft library that it has snapshotted, so that Raft can discard old log entries. If maxraftstate is -1, you do not have to snapshot. maxraftstate applies to the GOB-encoded bytes your Raft passes to persister.SaveRaftState().
+The tester passes maxraftstate to your StartKVServer(). maxraftstate indicates the maximum allowed size of your
+persistent Raft state in bytes (including the log, but not including snapshots). You should compare maxraftstate to
+persister.RaftStateSize(). Whenever your key/value server detects that the Raft state size is approaching this
+threshold, it should save a snapshot, and tell the Raft library that it has snapshotted, so that Raft can discard old
+log entries. If maxraftstate is -1, you do not have to snapshot. maxraftstate applies to the GOB-encoded bytes your Raft
+passes to persister.SaveRaftState().
 </p>
 
 * * *
 
+## Lab4 Sharded Key/Value Service
 
+### Introduction
+
+<p align="justify">
+
+In this lab you'll build a key/value storage system that "shards," or partitions, the keys over a set of replica groups.
+A shard is a subset of the key/value pairs; for example, all the keys starting with "a" might be one shard, all the keys
+starting with "b" another, etc. The reason for sharding is performance. Each replica group handles puts and gets for
+just a few of the shards, and the groups operate in parallel; thus total system throughput (puts and gets per unit time)
+increases in proportion to the number of groups.
+
+Your sharded key/value store will have two main components. First, a set of replica groups. Each replica group is
+responsible for a subset of the shards. A replica consists of a handful of servers that use Raft to replicate the
+group's shards. The second component is the "shard master". The shard master decides which replica group should serve
+each shard; this information is called the configuration. The configuration changes over time. Clients consult the shard
+master in order to find the replica group for a key, and replica groups consult the master in order to find out what
+shards to serve. There is a single shard master for the whole system, implemented as a fault-tolerant service using
+Raft.
+
+A sharded storage system must be able to shift shards among replica groups. One reason is that some groups may become
+more loaded than others, so that shards need to be moved to balance the load. Another reason is that replica groups may
+join and leave the system: new replica groups may be added to increase capacity, or existing replica groups may be taken
+offline for repair or retirement.
+
+The main challenge in this lab will be handling reconfiguration -- changes in the assignment of shards to groups. Within
+a single replica group, all group members must agree on when a reconfiguration occurs relative to client Put/Append/Get
+requests. For example, a Put may arrive at about the same time as a reconfiguration that causes the replica group to
+stop being responsible for the shard holding the Put's key. All replicas in the group must agree on whether the Put
+occurred before or after the reconfiguration. If before, the Put should take effect and the new owner of the shard will
+see its effect; if after, the Put won't take effect and client must re-try at the new owner. The recommended approach is
+to have each replica group use Raft to log not just the sequence of Puts, Appends, and Gets but also the sequence of
+reconfigurations. You will need to ensure that at most one replica group is serving requests for each shard at any one
+time.
+
+Reconfiguration also requires interaction among the replica groups. For example, in configuration 10 group G1 may be
+responsible for shard S1. In configuration 11, group G2 may be responsible for shard S1. During the reconfiguration from
+10 to 11, G1 and G2 must use RPC to move the contents of shard S1 (the key/value pairs) from G1 to G2.
+
+This lab's general architecture (a configuration service and a set of replica groups) follows the same general pattern
+as Flat Datacenter Storage, BigTable, Spanner, FAWN, Apache HBase, Rosebud, Spinnaker, and many others. These systems
+differ in many details from this lab, though, and are also typically more sophisticated and capable. For example, the
+lab doesn't evolve the sets of peers in each Raft group; its data and query models are very simple; and handoff of
+shards is slow and doesn't allow concurrent client access.
+</p>
+
+* * *
