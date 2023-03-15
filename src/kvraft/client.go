@@ -1,7 +1,7 @@
 package kvraft
 
 import (
-	"6.824/src/labrpc"
+	"6.824/src/src/labrpc"
 	"log"
 	"time"
 )
@@ -30,6 +30,7 @@ func nrand() int64 {
 func MakeClerk(servers []*labrpc.ClientEnd) *Clerk {
 	ck := new(Clerk)
 	ck.servers = servers
+	ck.clientId = nrand()
 	// You'll have to add code here.
 	return ck
 }

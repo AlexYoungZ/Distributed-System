@@ -18,8 +18,8 @@ package raft
 //
 
 import (
-	"6.824/src/labgob"
-	"6.824/src/labrpc"
+	"6.824/src/src/labgob"
+	"6.824/src/src/labrpc"
 	"bytes"
 	"fmt"
 	"log"
