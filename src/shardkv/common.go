@@ -1,5 +1,7 @@
 package shardkv
 
+import "6.824/src/src/labgob"
+
 //
 // Sharded key/value server.
 // Lots of replica groups, each running op-at-a-time paxos.
@@ -14,10 +16,12 @@ const (
 	ErrNoKey       = "ErrNoKey"
 	ErrWrongGroup  = "ErrWrongGroup"
 	ErrWrongLeader = "ErrWrongLeader"
+	ErrTimeOut     = "ErrTimeOut"
 )
 
 type Err string
 
+// PutAppendArgs
 // Put or Append
 type PutAppendArgs struct {
 	// You'll have to add definitions here.
@@ -27,18 +31,100 @@ type PutAppendArgs struct {
 	// You'll have to add definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
+	ClientId  int64
+	MsgId     int64
+	ConfigNum int
 }
 
 type PutAppendReply struct {
 	Err Err
 }
 
+func (c *PutAppendArgs) copy() PutAppendArgs {
+	r := PutAppendArgs{
+		Key:       c.Key,
+		Value:     c.Value,
+		Op:        c.Op,
+		ClientId:  c.ClientId,
+		MsgId:     c.MsgId,
+		ConfigNum: c.ConfigNum,
+	}
+	return r
+}
+
 type GetArgs struct {
 	Key string
 	// You'll have to add definitions here.
+	ClientId  int64
+	MsgId     int64
+	ConfigNum int
+}
+
+func (c *GetArgs) copy() GetArgs {
+	r := GetArgs{
+		Key:       c.Key,
+		ClientId:  c.ClientId,
+		MsgId:     c.MsgId,
+		ConfigNum: c.ConfigNum,
+	}
+	return r
 }
 
 type GetReply struct {
 	Err   Err
 	Value string
+}
+
+type FetchShardDataArgs struct {
+	ConfigNum int
+	ShardNum  int
+}
+
+type FetchShardDataReply struct {
+	Success    bool
+	MsgIndexes map[int64]int64
+	Data       map[string]string
+}
+
+func (reply *FetchShardDataReply) Copy() FetchShardDataReply {
+	res := FetchShardDataReply{
+		Success:    reply.Success,
+		Data:       make(map[string]string),
+		MsgIndexes: make(map[int64]int64),
+	}
+	for k, v := range reply.Data {
+		res.Data[k] = v
+	}
+	for k, v := range reply.MsgIndexes {
+		res.MsgIndexes[k] = v
+	}
+	return res
+}
+
+type CleanShardDataArgs struct {
+	ConfigNum int
+	ShardNum  int
+}
+
+type CleanShardDataReply struct {
+	Success bool
+}
+
+type MergeShardData struct {
+	ConfigNum  int
+	ShardNum   int
+	MsgIndexes map[int64]int64
+	Data       map[string]string
+}
+
+func init() {
+	labgob.Register(PutAppendArgs{})
+	labgob.Register(PutAppendReply{})
+	labgob.Register(GetArgs{})
+	labgob.Register(GetReply{})
+	labgob.Register(FetchShardDataArgs{})
+	labgob.Register(FetchShardDataReply{})
+	labgob.Register(CleanShardDataArgs{})
+	labgob.Register(CleanShardDataReply{})
+	labgob.Register(MergeShardData{})
 }
